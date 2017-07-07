@@ -1,0 +1,7 @@
+<template name="Templates">
+	{{#if $.Session.get 'newTemplate'}}
+		{{> NewTemplate}}
+	{{else}}
+		<button class="new-template">New Template</button>
+	{{/if}}
+</template>

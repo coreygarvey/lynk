@@ -53,3 +53,11 @@ FlowRouter.route('/shopping-list', {
 		BlazeLayout.render('MainLayout', {main: 'ShoppingList'});
 	}
 });
+
+
+FlowRouter.route('/template-upload', {
+	name: 'template-upload',
+	action() {
+		BlazeLayout.render('MainLayout', {main: 'Templates'});
+	}
+});

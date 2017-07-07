@@ -10,6 +10,7 @@
     "child_process": "^1.0.2",
     "faker": "^4.1.0",
     "meteor-node-stubs": "~0.2.4",
-    "simpl-schema": "^0.3.1"
+    "simpl-schema": "^0.3.1",
+    "web3": "^0.19.1"
   }
 }
