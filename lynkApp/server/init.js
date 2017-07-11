@@ -37,6 +37,25 @@ Meteor.startup(function () {
 	console.log("balance: " + balance.toString());
 
 	var filename = 'bigCube.stl';
-	//ethSendTransaction(fromAddr, fromPass, toAddr, filename);
+	
+	var file_output = getFileOutput(filename);
+	// Hash file with web3.sha3()
+	var hashedFile = hashFile(file_output);
+
+	// Sign file
+	var signedFile = ethSignFile(fromAddr, fromPass, hashedFile, file_output);
+
+
+
+
+	console.log("signedFile: " + signedFile);
+	console.log("signedFileLength: " + signedFile.length);
+
+	var signature = signedFile.slice(2, signedFile.length);
+	console.log("signature: " + signature);
+
+	var resultingAddr = ethVerifySig(signature, hashedFile, file_output);
+	console.log("resultingAddr: " + resultingAddr);
+
 
 });

@@ -15,7 +15,7 @@ contract Project {
 
   // Mapping between version signatures (currently hashes)
   //    and the pubKey that signed (user's eth address)
-  mapping (bytes32 => address) public versions;
+  mapping (bytes32 => string) public versions;
 
   function setTemplate(string templateSig){
       if(msg.sender != owner) return;
@@ -40,11 +40,11 @@ contract Project {
   function getTests() constant returns (string){
       return tests;
   }
-  function setVersion(bytes32 versionSig){
-      versions[versionSig] = msg.sender;
+  function setVersion(bytes32 versionSig, string sig){
+      versions[versionSig] = sig;
   }
   
-  function getVersion(bytes32 versionSig) constant returns (address){
+  function getVersion(bytes32 versionSig) constant returns (string){
       return versions[versionSig];
   }
 }

@@ -3,8 +3,8 @@ var sjcl = require('./node_modules/sjcl/sjcl.js')
 if (Meteor.isServer) {
   Meteor.startup(function () {
     // code to run on server at startup
-
-    // Open the file and read into file_output
+  /*
+  // Open the file and read into file_output
 	const data = Assets.getText('bigCube.stl');
 	console.log("here's the data: ");
 	var file_output = '';
@@ -42,5 +42,6 @@ if (Meteor.isServer) {
 
   console.log("Decrypted hash: ");
   console.log(plaintext);
+  */
   });
 }
