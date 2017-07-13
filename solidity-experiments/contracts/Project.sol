@@ -23,6 +23,7 @@ contract Project {
   // Mapping between user address and versions
   mapping (address => Version[]) public versions;
 
+  // User commiting a hash:signature pair to contract
   function commitVersion(bytes32 hash, string signature){
       versions[msg.sender].push(Version({
           hash: hash,
@@ -31,7 +32,15 @@ contract Project {
       return;
   }
 
+  // modifier for only the owner of the contract
+  modifier onlyOwner(){
+      require(msg.sender == owner);
+      _;
+  }
+
+  // retrieving the hash from the signature
   function returnHash(string signature) constant returns (bytes32) {
+
       uint length = versions[msg.sender].length;
       for (uint i=0; i<length; i++){
           var version = versions[msg.sender][i];
@@ -107,24 +116,21 @@ contract Project {
 
   */
  
-  function setTemplate(string templateSig){
-      if(msg.sender != owner) return;
+  function setTemplate(string templateSig) onlyOwner {
       template = templateSig;
   }
   function getTemplate() constant returns (string){
       return template;
   }
 
-  function setDetails(string detailsSig){
-      if(msg.sender != owner) return;
+  function setDetails(string detailsSig) onlyOwner {
       details = detailsSig;
   }
   function getDetails() constant returns (string){
       return details;
   }
 
-  function setTests(string testsSig){
-      if(msg.sender != owner) return;
+  function setTests(string testsSig) onlyOwner {
       tests = testsSig;
   }
   function getTests() constant returns (string){
