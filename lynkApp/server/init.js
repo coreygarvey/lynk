@@ -57,5 +57,7 @@ Meteor.startup(function () {
 	var resultingAddr = ethVerifySig(signature, hashedFile, file_output);
 	console.log("resultingAddr: " + resultingAddr);
 
+	
+
 
 });
