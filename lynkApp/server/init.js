@@ -23,41 +23,118 @@ Meteor.startup(function () {
 	var addr = ethCreateAccount("password");
 	console.log("New Address!");
 	console.log(addr);
+	
 	*/
-
 	// Store and print accounts
 	var accounts = ethStoreAccounts();
 	var fromAddr = accounts[0];
 	var fromPass = "password";
 	var toAddr = accounts[1];
-
-
-
 	var balance = ethGetBalance(fromAddr);
 	console.log("balance: " + balance.toString());
-
-	var filename = 'bigCube.stl';
 	
-	var file_output = getFileOutput(filename);
-	// Hash file with web3.sha3()
-	var hashedFile = hashFile(file_output);
+/*
+	// Create Contract
+	
+	var contract = ethCreateSmartContract(fromAddr,fromPass, 
+          function(_contractAddress) {
+            contractAddress = _contractAddress;
+            Meteor.settings.contractAddress = contractAddress;
+            // Must store contract address for use in setting student amount
+    });
 
-	// Sign file
-	var signedFile = ethSignFile(fromAddr, fromPass, hashedFile, file_output);
+	console.log(contract);
+	
+    console.log("contractAddress: " + contractAddress);
+
+*/
+
+	// Owner uploads template, details, tests
+	
+	// Defile files
+	var templateName = 'template.stl';
+	var detailsName = 'details.txt';
+	var testsName = 'tests.txt';
+	
+	// Open files and hash with web3.sha3()
+	var templateOutput = getHexFileOutput(templateName);
+	var templateHash = hashFile(templateOutput);
+	console.log("templateHash: " + templateOutput);
+	
+	var detailsOutput = getFileOutput(detailsName);
+	var detailsHash = hashFile(detailsOutput);
+	console.log("detailsOutput: " + detailsOutput);
+	console.log("detailsHash: " + detailsHash);
+	
+	var testsOutput = getFileOutput(testsName);
+	var testsHash = hashFile(testsOutput);
+	console.log("testsOutput: " + testsOutput);
+	console.log("testsHash: " + testsHash);
+
+	// Sign files
+	var templateSig = ethSignFile(fromAddr, fromPass, templateHash);
+
+	var detailsSig = ethSignFile(fromAddr, fromPass, detailsHash);
+
+	var testsSig = ethSignFile(fromAddr, fromPass, testsHash);
 
 
+	var contractAddress = "0x42ae83f7509be447d48185dcaa528f1dc8e2fbb2";
+    
+	var versionName = 'version1.stl';
+	var versionOutput = getHexFileOutput(versionName);
+	var versionHash = hashFile(versionOutput);
+	var versionSig = ethSignFile(fromAddr, fromPass, versionHash);
 
 
-	console.log("signedFile: " + signedFile);
-	console.log("signedFileLength: " + signedFile.length);
+    /*
+	// Setting values below
 
-	var signature = signedFile.slice(2, signedFile.length);
-	console.log("signature: " + signature);
+    var setTemplateTxn = ethSetProjectTemplate(contractAddress, fromAddr, fromPass, templateHash, templateSig);
+    console.log("setTemplateTxn: " + setTemplateTxn);
 
-	var resultingAddr = ethVerifySig(signature, hashedFile, file_output);
-	console.log("resultingAddr: " + resultingAddr);
+    var setDetailsTxn = ethSetProjectDetails(contractAddress, fromAddr, fromPass, detailsHash, detailsSig);
+    console.log("setDetailsTxn: " + setDetailsTxn);
+
+    var setTestsTxn = ethSetProjectTests(contractAddress, fromAddr, fromPass, testsHash, testsSig);
+    console.log("setTestsTxn: " + setTestsTxn);
+
 
 	
+
+
+	ethCommitVersion(contractAddress, fromAddr, versionHash, versionSig);
+
+
+	*/
+
+
+
+	// Getting values below
+
+
+	var templateBCHash = ethGetProjectTemplate(contractAddress, fromAddr, fromPass, templateSig);
+	console.log("templateBCHash: " + templateBCHash);
+
+	var detailsBCHash = ethGetProjectDetails(contractAddress, fromAddr, fromPass, detailsSig);
+	console.log("detailsBCHash: " + detailsBCHash);
+
+	var testsBCHash = ethGetProjectTests(contractAddress, fromAddr, fromPass, testsSig);
+	console.log("testsBCHash: " + testsBCHash);
+
+	var versionBCHash = ethGetVersionHash(contractAddress, versionSig);
+	console.log("version hash: " + versionHash);
+	
+
+	var ownerAddress = ethGetOwnerAddress(contractAddress);
+	console.log("ownerAddress:" + ownerAddress);
+	
+	
+	var sigAddress = ethVerifySig(versionSig, versionHash);
+	console.log("sigAddress: " + sigAddress);
+/*
+*/
+
 
 
 });
