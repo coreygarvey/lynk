@@ -16,6 +16,18 @@ Meteor.startup(function () {
 	});
 	*/
 
+	var originalFile = "bigCube.stl";
+	var originalOutput = getHexFileOutput(originalFile);
+	var lynkFile = "bigCube.stlY";
+	var lynkOutput = getHexLynkFileOutput(lynkFile);
+
+	console.log("originalOutput: ")
+	console.log(originalOutput)
+	console.log("lynkOutput: ")
+	console.log(lynkOutput)
+
+
+
 	
 
 	// Create new account 
@@ -24,7 +36,7 @@ Meteor.startup(function () {
 	console.log("New Address!");
 	console.log(addr);
 	
-	*/
+	
 	// Store and print accounts
 	var accounts = ethStoreAccounts();
 	var fromAddr = accounts[0];
@@ -32,7 +44,7 @@ Meteor.startup(function () {
 	var toAddr = accounts[1];
 	var balance = ethGetBalance(fromAddr);
 	console.log("balance: " + balance.toString());
-	
+*/	
 /*
 	// Create Contract
 	
@@ -47,7 +59,7 @@ Meteor.startup(function () {
 	
     console.log("contractAddress: " + contractAddress);
 
-*/
+
 
 	// Owner uploads template, details, tests
 	
@@ -85,7 +97,7 @@ Meteor.startup(function () {
 	var versionOutput = getHexFileOutput(versionName);
 	var versionHash = hashFile(versionOutput);
 	var versionSig = ethSignFile(fromAddr, fromPass, versionHash);
-
+*/
 
     /*
 	// Setting values below
@@ -112,7 +124,7 @@ Meteor.startup(function () {
 
 	// Getting values below
 
-
+/*
 	var templateBCHash = ethGetProjectTemplate(contractAddress, fromAddr, fromPass, templateSig);
 	console.log("templateBCHash: " + templateBCHash);
 
@@ -132,7 +144,7 @@ Meteor.startup(function () {
 	
 	var sigAddress = ethVerifySig(versionSig, versionHash);
 	console.log("sigAddress: " + sigAddress);
-/*
+
 */
 
 
