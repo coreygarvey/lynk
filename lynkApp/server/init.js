@@ -1,4 +1,5 @@
 import '../ethereum/ethereum.js';
+import '../files/files.js';
 
 Meteor.startup(function () {
 	// Print File with C++ process
@@ -14,7 +15,7 @@ Meteor.startup(function () {
 	ls.on('close', (code) => {
 	  console.log(`child process exited with code ${code}`);
 	});
-	*/
+	
 
 	var originalFile = "bigCube.stl";
 	var originalOutput = getHexFileOutput(originalFile);
@@ -25,10 +26,173 @@ Meteor.startup(function () {
 	console.log(originalOutput)
 	console.log("lynkOutput: ")
 	console.log(lynkOutput)
+	*/
+
+	/* START START START START START START START START START START */
+	/* 
+
+	MANGER MANGER MANGER MANGER MANGER MANGER
+	=========================================
+	*/
+
+	/**** PREPARE ACCOUNTS ****/
+	// Store all accounts in variable
+	var accounts = ethStoreAccounts();
+	var managerAddr = accounts[0];
+	var managerPass = "password";
+	var designerAddr = accounts[1];
+
+	/**** CREATE PROJECT ****/
+	// Remove all projects
+	Projects.remove({});
+	// Create Project Object (Owner Pub Key)
+	var projectName = "Project 1";
+	var description = "Designing a new piece for the widget";
+	var managerId = 1;
+
+	Projects.insert({
+		name: project1,
+		desc: description,
+		creator: managerId,
+		ownerPubKey: managerAddr
+	});
+	// So this line will return something
+	var project1 = Projects.findOne({}, {
+		sort: {
+			createdAt: +1, 
+			limit: 1
+		}
+	});
+	console.log("Project creation: ");
+	console.log(project1);
 
 
+	/**** ADD ALL FILES TO PROJECT ****/
+	// Upload Test Files (Hash and Store)
+	var test1 = "tests1.txt";
+	var test2 = "tests2.txt";
+	var test1Output = getFileOutput(test1);
+	var test1Hash = hashFile(test1Output);
+	var test2Output = getFileOutput(test2);
+	var test2Hash = hashFile(test2Output);
+	//console.log("test1Hash: " + test1Hash);
+	//console.log("test2Hash: " + test2Hash);
+
+	// Store Files at hash!!!
+
+	TestFiles.remove({});
+
+	TestFiles.insert({
+		hash: test1Hash,
+		name: test1
+	});
+	TestFiles.insert({
+		hash: test2Hash,
+		name: test2
+	});
+	// Turn this into function, used later
+	/*
+	var test1Returned = TestFiles.findOne({hash: test1Hash});
+	var test2Returned = TestFiles.findOne({hash: test2Hash});
+	console.log("test1Returned: " + test1Returned.name);
+	console.log("test2Returned: " + test2Returned.name);
+	*/
+
+	//Create Test Objects (Signature and Pub Key)
+	var testHashes = [test1Hash, test2Hash];
+	// Sign and store tests in project
+	for(i=0; i<testHashes.length; i++) {
+		var testName = "Test #" + (i+1);
+		var testHash = testHashes[i];
+		var testSig = ethSignFile(managerAddr, managerPass, testHash);
+		Projects.update(project1._id, { 
+			$push: { 
+				tests: {
+					name: testName,
+					desc: "Just another test doc",
+					signature: testSig,
+					publicKey: managerAddr,
+				}
+			} 
+		});
+	}
+	
+	
+	console.log("Project updated with tests: ");
+	project1 = Projects.findOne({}, {
+		sort: {
+			createdAt: +1, 
+			limit: 1
+		}
+	});
+	console.log(project1);
+	//Update Project with Test Objects
+	
+
+	/*
+	Upload Template File (Hash and Store)
+	Create Template Object (Signature and Pub Key)
+	Update Project with Template Object
+
+	Create Protocol File (Details, tests, results, printable)
+	Upload Protocol File (Hash and Store)
+	Create Protocol Object (Signature and Pub Key)
+	Update Project with Protocol Object
+
+	Create Contract on BC
+	Update Test Files, Template, Protocol with proper details
 
 	
+	DESIGNER DESIGNER DESIGNER DESIGNER DESIGNER 
+	============================================
+	Get Template Hash from BC using Project ID
+	Confirm Owner Signed
+	Get File
+	Confirm Hash is of File
+
+	Edit Template and Resave
+	Upload new version file
+	Store in temporary location
+	Store location in project object
+
+	
+	Get Protocol from BC
+	Confirm Owner Signed
+	Get File
+	Confirm Hash is of File
+	Indicate protocol tests to test
+	
+	Get necessary test files from DB
+	Test new version against test files
+
+	Store "protocol-test:result" as metadata on file
+	Hash and store file
+
+	Create version object in DB (sig and pub key)
+
+	Store tests passed, printable status in version object
+
+	Store signed version on contract
+
+
+	Print version object details (tests passed, printable, sig, pub key)
+
+	MANGER MANGER MANGER MANGER MANGER MANGER
+	=========================================
+	Get latest version from Project object
+
+	Retrieve version hash from BC
+	Confirm Owner Signed
+	Get File
+	Confirm Hash is of File
+
+	Get version file
+	If printable in metadata: print file
+	
+	*/ 
+	/* END END END END END END END END END END END END END END END END END END END */
+
+
 
 	// Create new account 
 	/*
