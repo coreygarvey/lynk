@@ -225,7 +225,7 @@ ethGetProjectDetails = function ethGetProjectDetails(contractAddress, fromAddres
 }
 
 // Set project template/details/tests
-ethSetProjectTests = function ethSetProjectTests(contractAddress, ownerAddress, ownerPassword, testsHash, testsSig){
+ethSetProjectTest = function ethSetProjectTest(contractAddress, ownerAddress, ownerPassword, testsHash, testsSig){
   web3.eth.defaultAccount=ownerAddress;
   var targetContract = projectContractAbi.at(contractAddress);
   //web3.personal.unlockAccount(ownerAddress, ownerPassword);
@@ -236,7 +236,7 @@ ethSetProjectTests = function ethSetProjectTests(contractAddress, ownerAddress, 
 }
 
 
-ethGetProjectTests = function ethGetProjectTemplate(contractAddress, fromAddress, fromPassword, testsSig){
+ethGetProjectTest = function ethGetProjectTemplate(contractAddress, fromAddress, fromPassword, testsSig){
   var targetContract = projectContractAbi.at(contractAddress);
   //web3.personal.unlockAccount(fromAddress, fromPassword);
 
