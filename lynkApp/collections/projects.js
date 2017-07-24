@@ -113,6 +113,13 @@ ProjectSchema = new SimpleSchema({
 		type: String,
 		label: "Owner Public Key",
 	},
+
+	contractAddr: {
+		type: String,
+		label: "Contract Address",
+		optional: true,
+	},
+
 	createdAt: {
 		type: Date,
 		label: "Created At",
@@ -174,6 +181,7 @@ Projects.publicFields = {
   name: 1,
   desc: 1,
   ownerPubKey: 1,
+  contractAddr: 1,
   template: 1,
   protocol: 1,
   tests: 1,

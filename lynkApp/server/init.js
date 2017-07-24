@@ -47,17 +47,17 @@ Meteor.startup(function () {
 	Projects.remove({});
 	// Create Project Object (Owner Pub Key)
 	var projectName = "Project 1";
-	var description = "Designing a new piece for the widget";
+	var projectDescription = "Designing a new piece for the widget";
 	var managerId = 1;
 
 	Projects.insert({
-		name: project1,
-		desc: description,
+		name: projectName,
+		desc: projectDescription,
 		creator: managerId,
 		ownerPubKey: managerAddr
 	});
 	// So this line will return something
-	var project1 = Projects.findOne({}, {
+	project1 = Projects.findOne({}, {
 		sort: {
 			createdAt: +1, 
 			limit: 1
@@ -75,13 +75,8 @@ Meteor.startup(function () {
 	var test1Hash = hashFile(test1Output);
 	var test2Output = getFileOutput(test2);
 	var test2Hash = hashFile(test2Output);
-	//console.log("test1Hash: " + test1Hash);
-	//console.log("test2Hash: " + test2Hash);
-
 	// Store Files at hash!!!
-
 	TestFiles.remove({});
-
 	TestFiles.insert({
 		hash: test1Hash,
 		name: test1
@@ -90,14 +85,7 @@ Meteor.startup(function () {
 		hash: test2Hash,
 		name: test2
 	});
-	// Turn this into function, used later
-	/*
-	var test1Returned = TestFiles.findOne({hash: test1Hash});
-	var test2Returned = TestFiles.findOne({hash: test2Hash});
-	console.log("test1Returned: " + test1Returned.name);
-	console.log("test2Returned: " + test2Returned.name);
-	*/
-
+	//Update Project with Test Objects
 	//Create Test Objects (Signature and Pub Key)
 	var testHashes = [test1Hash, test2Hash];
 	// Sign and store tests in project
@@ -116,8 +104,6 @@ Meteor.startup(function () {
 			} 
 		});
 	}
-	
-	
 	console.log("Project updated with tests: ");
 	project1 = Projects.findOne({}, {
 		sort: {
@@ -126,22 +112,126 @@ Meteor.startup(function () {
 		}
 	});
 	console.log(project1);
-	//Update Project with Test Objects
+
+	/* TEMPLATE FILE */
+	// Upload Template File (Hash and Store)
+	var template1 = "template1.stl";
+	var template1Output = getHexFileOutput(template1);
+	var template1Hash = hashFile(template1Output);
+	// Store Files at hash
+	//	  All being stored as "TestFiles" at the moment
+	TestFiles.insert({
+		hash: template1Hash,
+		name: template1
+	});
+
+	// Turn this into function, used later
+	var template1Returned = TestFiles.findOne({hash: template1Hash});
+	console.log("template1Returned: " + template1Returned.name);
+	//Create Template Object (Signature and Pub Key)
+	//Update Project with Template Object
+	var templateHash = template1Hash
+	// Sign and store tests in project
+	var templateName = "Template #1"	
+	var templateSig = ethSignFile(managerAddr, managerPass, templateHash);
 	
+	Projects.update(project1._id, { 
+		$set: { 
+			template: {
+				name: templateName,
+				desc: "First template file for project",
+				signature: templateSig,
+				publicKey: managerAddr,
+			}
+		} 
+	});
+	console.log("Project updated with template: ");
+	project1 = Projects.findOne({}, {
+		sort: {
+			createdAt: +1, 
+			limit: 1
+		}
+	});
+	console.log(project1);
 
-	/*
-	Upload Template File (Hash and Store)
-	Create Template Object (Signature and Pub Key)
-	Update Project with Template Object
 
-	Create Protocol File (Details, tests, results, printable)
-	Upload Protocol File (Hash and Store)
-	Create Protocol Object (Signature and Pub Key)
-	Update Project with Protocol Object
+	/* PROTOCOL FILE */
+	// Create Protocol File (Details, tests, results, printable)
+	// Upload Protocol File (Hash and Store)
+	var protocol1 = "protocol1.txt";
+	var protocol1Output = getFileOutput(protocol1);
+	var protocol1Hash = hashFile(protocol1Output);
+	// Store Files at hash
+	//	  All being stored as "TestFiles" at the moment
+	TestFiles.insert({
+		hash: protocol1Hash,
+		name: protocol1
+	});
 
-	Create Contract on BC
-	Update Test Files, Template, Protocol with proper details
+	// Turn this into function, used later
+	var protocol1Returned = TestFiles.findOne({hash: protocol1Hash});
+	console.log("protocol1Returned: " + protocol1Returned.name);
+	//Create Protocol Object (Signature and Pub Key)
+	//Update Project with Protocol Object
+	var protocolHash = protocol1Hash
+	// Sign and store tests in project
+	var protocolName = "Protocol #1"	
+	var protocolSig = ethSignFile(managerAddr, managerPass, protocolHash);
+	
+	Projects.update(project1._id, { 
+		$set: { 
+			protocol: {
+				name: protocolName,
+				desc: "First protocol file for project",
+				signature: protocolSig,
+				publicKey: managerAddr,
+			}
+		} 
+	});
+	console.log("Project updated with protocol: ");
+	project1 = Projects.findOne({}, {
+		sort: {
+			createdAt: +1, 
+			limit: 1
+		}
+	});
+	console.log(project1);
+	
+	/* BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN */
+	//Create Contract on BC
 
+    var contract = ethCreateSmartContract(managerAddr,managerPass, 
+    	Meteor.bindEnvironment(function(_contractAddress) {
+            contractAddress = _contractAddress;
+            Meteor.settings.contractAddress = contractAddress;
+            console.log("Contract Address: " + contractAddress);
+            //setProjectContract(project1, contractAddress);
+            Projects.update(project1._id, { 
+				$set: { 
+					contractAddr: contractAddress
+				} 
+			});
+			project1 = Projects.findOne({}, {
+				sort: {
+					createdAt: +1, 
+					limit: 1
+				}
+			});
+            console.log("Project with contract address: ");
+            console.log(project1);
+	    }, function(e) { 
+	    	console.log(e);
+	    })
+	);
+
+    setTimeout(function(){ 
+        console.log("After the madness: ");
+        console.log(project1);
+    }, 10000); 
+
+//Update Contract with details from Test Files, Template, Protocol
+
+/*
 	
 	DESIGNER DESIGNER DESIGNER DESIGNER DESIGNER 
 	============================================
@@ -314,3 +404,7 @@ Meteor.startup(function () {
 
 
 });
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

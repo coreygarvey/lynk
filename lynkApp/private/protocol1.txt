@@ -1,0 +1,3 @@
+Here are the details of our project.
+
+Txt file must be hashed differently.
