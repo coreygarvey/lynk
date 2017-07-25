@@ -251,9 +251,9 @@ ethCommitVersion = function ethCommitVersion(contractAddress, fromAddress, templ
   var targetContract = projectContractAbi.at(contractAddress);
   //web3.personal.unlockAccount(ownerAddress, ownerPassword);
 
-  targetContract.commitVersion(templateHash, templateSig, {gas: 250000});
+  var versionHash = targetContract.commitVersion(templateHash, templateSig, {gas: 250000});
 
-  return;
+  return versionHash;
 }
 
 

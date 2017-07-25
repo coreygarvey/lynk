@@ -108,25 +108,40 @@ Meteor.startup(function () {
 		
 		//Store "protocol-test:result" as metadata on file
 		versionHexWithResults = prependResultsToVersion(version1, testResults);
-		
 		/* First 2 characters signal number of hex characters for Metadata */
 		console.log(versionHexWithResults);
 
+		// Upload file with metadata
+		uploadVersionFile(versionHexWithResults);
+
 		//Hash and store file
 		//Create Test Objects (Signature and Pub Key)
+		versionHash = hashFile(versionHexWithResults);
+		name = "version 1";
+		description = "First version in Lynk";
+		addVersionToProject(projectId, name, description, versionHash, designerAddr, designerPass);
 
+		console.log(Projects.findOne({_id:projectId}))
+
+		//Create version object in DB (sig and pub key)
+		//Store signed version on contract
+		setVersionTransaction = submitContractVersion(projectId, versionHash, designerAddr, designerPass);
+
+		console.log("setVersionTransaction: ");
+		console.log(setVersionTransaction);
 	}, 13000)
 
 	Meteor.setTimeout(function(){
-		//Create version object in DB (sig and pub key)
-	}, 8000)
+
+		
+	}, 14000)
 
 	Meteor.setTimeout(function(){
 		//Store tests passed, printable status in version object
 	}, 8000)
 
 	Meteor.setTimeout(function(){
-		//Store signed version on contract
+		
 	}, 8000)
 
 	Meteor.setTimeout(function(){
@@ -297,6 +312,14 @@ uploadFile = function uploadFile(filename, hex){
 	});
 }
 
+uploadVersionFile = function uploadVersionFile(versionHex){
+	versionHash = hashFile(versionHex);
+	VersionFiles.insert({
+		hash: versionHash,
+		fileHex: versionHex
+	});
+}
+
 getFile = function getFile(hash){
 	// Store Files at hash!!!
 	returnFile = TestFiles.findOne({
@@ -337,12 +360,12 @@ createProject = function createProject(name, description, ownerId, ownerAddr){
 }
 
 
-addTestToProject = function addTestToProject(project, name, description, filename, ownerAddr, ownerPass){
+addTestToProject = function addTestToProject(projectId, name, description, filename, ownerAddr, ownerPass){
 //Create Test Objects (Signature and Pub Key)
 	var output = getFileOutput(filename);
 	var hash = hashFile(output);
 	var signature = ethSignFile(ownerAddr, ownerPass, hash);
-	Projects.update(project._id, { 
+	Projects.update(projectId, { 
 		$push: { 
 			tests: {
 				name: name,
@@ -355,12 +378,12 @@ addTestToProject = function addTestToProject(project, name, description, filenam
 }
 
 
-addTemplateToProject = function addTestToProject(project, name, description, filename, ownerAddr, ownerPass){
+addTemplateToProject = function addTemplateToProject(projectId, name, description, filename, ownerAddr, ownerPass){
 	//Create Test Objects (Signature and Pub Key)
 	var output = getHexFileOutput(filename);
 	var hash = hashFile(output);
 	var signature = ethSignFile(ownerAddr, ownerPass, hash);
-	Projects.update(project._id, { 
+	Projects.update(projectId, { 
 		$set: { 
 			template: {
 				name: name,
@@ -375,12 +398,12 @@ addTemplateToProject = function addTestToProject(project, name, description, fil
 
 
 
-addProtocolToProject = function addTestToProject(project, name, description, filename, ownerAddr, ownerPass){
+addProtocolToProject = function addProtocolToProject(projectId, name, description, filename, ownerAddr, ownerPass){
 	//Create Test Objects (Signature and Pub Key)
 	var output = getFileOutput(filename);
 	var hash = hashFile(output);
 	var signature = ethSignFile(ownerAddr, ownerPass, hash);
-	Projects.update(project._id, { 
+	Projects.update(projectId, { 
 		$set: { 
 			protocol: {
 				name: name,
@@ -404,9 +427,24 @@ addRawVersionToProject = function addRawVersionToProject(project, filename){
 				hash: hash,
 			}
 		} 
-	});
+	});	
+}
 
-	
+addVersionToProject = function addVersionToProject(projectId, name, description, versionHash, ownerAddr, ownerPass){
+	//Create Test Objects (Signature and Pub Key)
+	var output = VersionFiles.findOne({hash:versionHash}).fileHex
+	var hash = versionHash;
+	var signature = ethSignFile(ownerAddr, ownerPass, hash);
+	Projects.update(projectId, { 
+		$push: { 
+			versions: {
+				name: name,
+				desc: description,
+				signature: signature,
+				publicKey: ownerAddr,
+			}
+		} 
+	});
 }
 
 createContract = function createContract(project, ownerAddress, ownerPass){
@@ -466,6 +504,16 @@ setContractProtocol = function setContractProtocol(project, filename, ownerAddr,
 }
 	
 
+submitContractVersion = function submitContractVersion(projectId, versionHash, ownerAddr, ownerPass){
+	var project = Projects.findOne({_id: projectId});
+	var contractAddress = project.contractAddr;
+	var hash = versionHash;
+	var signature = ethSignFile(ownerAddr, ownerPass, hash); 
+	setVersionTransaction = ethCommitVersion(contractAddress, ownerAddr, hash, signature);
+	return setVersionTransaction;
+}
+	
+
 
 
 managerProjectSetup = function projectSetup(managerAddr, managerPass){
@@ -498,7 +546,7 @@ managerProjectSetup = function projectSetup(managerAddr, managerPass){
 		var testFilename = testFilenames[i];
 		
 
-		addTestToProject(project1, testName, testDesc, testFilename, managerAddr, managerPass);
+		addTestToProject(project1._id, testName, testDesc, testFilename, managerAddr, managerPass);
 	}
 
 	/* TEMPLATE FILE */
@@ -509,7 +557,7 @@ managerProjectSetup = function projectSetup(managerAddr, managerPass){
 	var template1Name = "Template #1"
 	var template1Desc= "First template file for project";
 	
-	addTemplateToProject(project1, template1Name, template1Desc, template1, managerAddr, managerPass);
+	addTemplateToProject(project1._id, template1Name, template1Desc, template1, managerAddr, managerPass);
 	
 	project1 = Projects.findOne({}, {
 		sort: {
@@ -525,7 +573,7 @@ managerProjectSetup = function projectSetup(managerAddr, managerPass){
 	var protocol1Name = "Protocol #1"	
 	var protocol1Desc=  "First protocol file for project"
 
-	addProtocolToProject(project1, protocol1Name, protocol1Desc, protocol1, managerAddr, managerPass);
+	addProtocolToProject(project1._id, protocol1Name, protocol1Desc, protocol1, managerAddr, managerPass);
 
 	/* BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN */
 	//Create Contract on BC
