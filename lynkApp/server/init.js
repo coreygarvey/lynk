@@ -102,12 +102,20 @@ Meteor.startup(function () {
 		console.log("Test results:");
 		console.log(testResults);
 
-	}, 13000)
+	}, 12000)
 	
 	Meteor.setTimeout(function(){
+		
 		//Store "protocol-test:result" as metadata on file
+		versionHexWithResults = prependResultsToVersion(version1, testResults);
+		
+		/* First 2 characters signal number of hex characters for Metadata */
+		console.log(versionHexWithResults);
+
 		//Hash and store file
-	}, 8000)
+		//Create Test Objects (Signature and Pub Key)
+
+	}, 13000)
 
 	Meteor.setTimeout(function(){
 		//Create version object in DB (sig and pub key)
@@ -651,4 +659,24 @@ testAgainstLatestVersion = function testAgainstLatestVersion(projectId, testHash
 	}
 
 	return testResults;
+}
+
+
+prependResultsToVersion = function addResultsToVersion(versionFilename, resultsDict){
+	
+	// NEED TO SIGNAL HOW MANY BYTES FOR METADATA
+	versionHexOutput = getHexFileOutput(versionFilename);
+
+	testResultsString = JSON.stringify(resultsDict);
+
+	resultsHex = '';
+	for(i=0; i<testResultsString.length; i++){
+		resultsHex += testResultsString[i].charCodeAt(0).toString(16);
+	}
+
+	resultsLen = resultsHex.length;
+
+    versionHexWithResults = resultsLen + resultsHex + versionHexOutput;
+
+    return versionHexWithResults;
 }

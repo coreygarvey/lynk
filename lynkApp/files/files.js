@@ -19,6 +19,18 @@ getHexFileOutput = function getFileOutput(filename){
 	}
 	return file_output;
 }
+/*
+prependTestResults = function getFileOutput(filename, testResults){
+	// Output file from filename
+	var filename = filename;
+	const data = Assets.getText(filename);
+	var file_output = '0x';
+	for (var i = 0, l = data.length; i < l; i++){
+		file_output += data[i].charCodeAt(0).toString(16);
+	}
+	return file_output;
+}
+*/
 
 /* Testing metadata within STL file */
 getHexLynkFileOutput = function getFileOutput(filename){
