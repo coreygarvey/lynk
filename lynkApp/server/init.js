@@ -41,124 +41,91 @@ Meteor.startup(function () {
 	var managerAddr = accounts[0];
 	var managerPass = "password";
 	var designerAddr = accounts[1];
+	var designerPass = "password";
 
-	/**** CREATE PROJECT ****/
-	// Remove all projects
-	Projects.remove({});
-	// Create Project Object (Owner Pub Key)
-	var projectName = "Project 1";
-	var projectDescription = "Designing a new piece for the widget";
-	var managerId = 1;
-	createProject(projectName, projectDescription, managerId, managerAddr);
+	var projectId = managerProjectSetup(managerAddr, managerPass);
 
-	/**** ADD ALL FILES TO PROJECT ****/
+
 	
-	/* TEST FILES */
-	// Upload Test Files (Hash and Store)
-	var test1 = "tests1.txt";
-	var test2 = "tests2.txt";
-	// Remove all files
-	TestFiles.remove({});
-	uploadFile(test1, false);
-	uploadFile(test2, false);
-	//Update Project with Test Objects
-	//Create Test Objects (Signature and Pub Key)
-	var testFilenames = [test1, test2];
-	// Sign and store tests in project
-	for(i=0; i<testFilenames.length; i++) {
-		var testName = "Test #" + (i+1);
-		var testDesc = "Here we go, test #" + (i+1);
-		var testFilename = testFilenames[i];
+	//DESIGNER DESIGNER DESIGNER DESIGNER DESIGNER 
+	//============================================
+	//Get Template Hash from BC using Project ID
+	Meteor.setTimeout(function(){
+		templatefile = designerGetTemplate(projectId, designerAddr, designerPass);
+		console.log("Template file: ");
+		console.log(templateFile);
+	}, 8000)
+
+	
+	Meteor.setTimeout(function(){
 		
+		//Edit Template and Resave
+		//Upload new version file
+		//Store in temporary location
+		//Store location in project object	
 
-		addTestToProject(project1, testName, testDesc, testFilename, managerAddr, managerPass);
-	}
+		/* TODO */
+		// Get file from template and edit
+		// Save as version1.stl
+		// versionFile = designerVersionFromTemplate(templateFile, designerAddr, designerPass);
+		//		Get Template
+		//		Open, edit file, save as version1.stl
+		version1 = 'version1.stl';
+		uploadFile(version1, true);
 
-	/* TEMPLATE FILE */
-	// Upload Template File (Hash and Store)
-	var template1 = "template1.stl";
-	uploadFile(template1, true);
+		addRawVersionToProject(project1, version1);
+		
+	}, 8000)
+
 	
-	var template1Name = "Template #1"
-	var template1Desc= "First template file for project";
+	Meteor.setTimeout(function(){
+		//Get Protocol from BC
+		//Confirm Owner Signed
+		//Get File
+		//Confirm Hash is of File
+		protocolfile = designerGetProtocol(projectId, designerAddr, designerPass);
+		console.log("Protocol file: ");
+		console.log(protocolFile);
+
+	}, 9000)
+
+	Meteor.setTimeout(function(){
+		testHashes = protocolGetTestHashes(protocolFile);
+		console.log("testHashes:");
+		console.log(testHashes);
+	}, 11000)
 	
-	addTemplateToProject(project1, template1Name, template1Desc, template1, managerAddr, managerPass);
+	Meteor.setTimeout(function(){
+		
+		testResults = testAgainstLatestVersion(projectId, testHashes);
+
+		console.log("Test results:");
+		console.log(testResults);
+
+	}, 13000)
 	
+	Meteor.setTimeout(function(){
+		//Store "protocol-test:result" as metadata on file
+		//Hash and store file
+	}, 8000)
 
-	console.log("Project updated with template: ");
-	project1 = Projects.findOne({}, {
-		sort: {
-			createdAt: +1, 
-			limit: 1
-		}
-	});
-	console.log(project1);
+	Meteor.setTimeout(function(){
+		//Create version object in DB (sig and pub key)
+	}, 8000)
 
+	Meteor.setTimeout(function(){
+		//Store tests passed, printable status in version object
+	}, 8000)
 
-	/* PROTOCOL FILE */
-	var protocol1 = "protocol1.txt";
-	uploadFile(protocol1, false);
-	var protocol1Name = "Protocol #1"	
-	var protocol1Desc=  "First protocol file for project"
+	Meteor.setTimeout(function(){
+		//Store signed version on contract
+	}, 8000)
 
-	addProtocolToProject(project1, protocol1Name, protocol1Desc, protocol1, managerAddr, managerPass);
-
-	/* BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN */
-	//Create Contract on BC
-	createContract(project1, managerAddr, managerPass);
-
-	//Update Contract with details from Test Files, Template, Protocol
-	templateSet = Meteor.setTimeout(function() {
-    	templateTxn = setContractTemplate(project1, template1, managerAddr, managerPass)
-    	test1Txn = setContractTest(project1, test1, managerAddr, managerPass)
-    	test2Txn = setContractTest(project1, test2, managerAddr, managerPass)
-    	protoTxn = setContractProtocol(project1, protocol1, managerAddr, managerPass)
-
-    	console.log("Transaction hashes:");
-    	console.log(templateTxn);
-    	console.log(test1Txn);
-    	console.log(test2Txn);
-    	console.log(protoTxn);
-    	
-	}, 5000);
-
-
+	Meteor.setTimeout(function(){
+		//Print version object details (tests passed, printable, sig, pub key)
+	}, 8000)
 
 /*
-	
-	DESIGNER DESIGNER DESIGNER DESIGNER DESIGNER 
-	============================================
-	Get Template Hash from BC using Project ID
-	Confirm Owner Signed
-	Get File
-	Confirm Hash is of File
-
-	Edit Template and Resave
-	Upload new version file
-	Store in temporary location
-	Store location in project object
-
-	
-	Get Protocol from BC
-	Confirm Owner Signed
-	Get File
-	Confirm Hash is of File
-	Indicate protocol tests to test
-	
-	Get necessary test files from DB
-	Test new version against test files
-
-	Store "protocol-test:result" as metadata on file
-	Hash and store file
-
-	Create version object in DB (sig and pub key)
-
-	Store tests passed, printable status in version object
-
-	Store signed version on contract
-
-
-	Print version object details (tests passed, printable, sig, pub key)
 
 	MANGER MANGER MANGER MANGER MANGER MANGER
 	=========================================
@@ -298,6 +265,49 @@ Meteor.startup(function () {
 
 });
 
+printProject = function printProject(projectId){
+	project = Projects.findOne({
+		_id: projectId
+	});
+	console.log("Printing project " + project.name);
+	console.log(project);
+}
+
+uploadFile = function uploadFile(filename, hex){
+	if(hex==false){
+		var fileOutput = getFileOutput(filename);	
+	}
+	else{
+		var fileOutput = getHexFileOutput(filename);	
+	}
+	var fileHash = hashFile(fileOutput);
+	// Store Files at hash!!!
+	
+	TestFiles.insert({
+		hash: fileHash,
+		name: filename
+	});
+}
+
+getFile = function getFile(hash){
+	// Store Files at hash!!!
+	returnFile = TestFiles.findOne({
+		hash: hash,
+	});
+	return returnFile;
+}
+
+
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   console.log("Starting wait");
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+  console.log("Done with wait");
+}
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -316,25 +326,8 @@ createProject = function createProject(name, description, ownerId, ownerAddr){
 			limit: 1
 		}
 	});
-	console.log("Project creation: ");
-	console.log(project1);
 }
 
-uploadFile = function uploadFile(filename, hex){
-	if(hex==false){
-		var fileOutput = getFileOutput(filename);	
-	}
-	else{
-		var fileOutput = getHexFileOutput(filename);	
-	}
-	var fileHash = hashFile(fileOutput);
-	// Store Files at hash!!!
-	
-	TestFiles.insert({
-		hash: fileHash,
-		name: filename
-	});
-}
 
 addTestToProject = function addTestToProject(project, name, description, filename, ownerAddr, ownerPass){
 //Create Test Objects (Signature and Pub Key)
@@ -360,8 +353,8 @@ addTemplateToProject = function addTestToProject(project, name, description, fil
 	var hash = hashFile(output);
 	var signature = ethSignFile(ownerAddr, ownerPass, hash);
 	Projects.update(project._id, { 
-		$push: { 
-			templates: {
+		$set: { 
+			template: {
 				name: name,
 				desc: description,
 				signature: signature,
@@ -371,6 +364,8 @@ addTemplateToProject = function addTestToProject(project, name, description, fil
 	});
 	
 }
+
+
 
 addProtocolToProject = function addTestToProject(project, name, description, filename, ownerAddr, ownerPass){
 	//Create Test Objects (Signature and Pub Key)
@@ -390,12 +385,27 @@ addProtocolToProject = function addTestToProject(project, name, description, fil
 	
 }
 
+addRawVersionToProject = function addRawVersionToProject(project, filename){
+	//Create Test Objects (Signature and Pub Key)
+	var output = getHexFileOutput(filename);
+	var hash = hashFile(output);
+	Projects.update(project._id, { 
+		$push: { 
+			rawVersions: {
+				name: filename,
+				hash: hash,
+			}
+		} 
+	});
+
+	
+}
+
 createContract = function createContract(project, ownerAddress, ownerPass){
 	var contract = ethCreateSmartContract(ownerAddress,ownerPass, 
     	Meteor.bindEnvironment(function(_contractAddress) {
             contractAddress = _contractAddress;
             Meteor.settings.contractAddress = contractAddress;
-            console.log("Contract Address: " + contractAddress);
             //setProjectContract(project1, contractAddress);
             Projects.update(project._id, { 
 				$set: { 
@@ -408,29 +418,17 @@ createContract = function createContract(project, ownerAddress, ownerPass){
 					limit: 1
 				}
 			});
-            console.log("Project with contract address: ");
-            console.log(project1);
 	    }, function(e) { 
 	    	console.log(e);
 	    })
 	);
 
-    setTimeout(function(){ 
-        console.log("Contract definitely created");
-    }, 10000); 
+    //setTimeout(function(){ 
+    //    console.log("Contract definitely created");
+    //}, 10000); 
 
 }
 
-printProject = function printProject(comment){
-	console.log(comment);
-	project = Projects.findOne({}, {
-		sort: {
-			createdAt: +1, 
-			limit: 1
-		}
-	});
-	
-}
 
 setContractTemplate = function setContractTemplate(project, filename, ownerAddr, ownerPass){
 	var contractAddress = project.contractAddr;
@@ -461,6 +459,196 @@ setContractProtocol = function setContractProtocol(project, filename, ownerAddr,
 	
 
 
+
+managerProjectSetup = function projectSetup(managerAddr, managerPass){
+	/**** CREATE PROJECT ****/
+	// Remove all projects
+	Projects.remove({});
+	// Create Project Object (Owner Pub Key)
+	var projectName = "Project 1";
+	var projectDescription = "Designing a new piece for the widget";
+	var managerId = 1;
+	createProject(projectName, projectDescription, managerId, managerAddr);
+
+	/**** ADD ALL FILES TO PROJECT ****/
+	
+	/* TEST FILES */
+	// Upload Test Files (Hash and Store)
+	var test1 = "tests1.txt";
+	var test2 = "tests2.txt";
+	// Remove all files
+	TestFiles.remove({});
+	uploadFile(test1, false);
+	uploadFile(test2, false);
+	//Update Project with Test Objects
+	//Create Test Objects (Signature and Pub Key)
+	var testFilenames = [test1, test2];
+	// Sign and store tests in project
+	for(i=0; i<testFilenames.length; i++) {
+		var testName = "Test #" + (i+1);
+		var testDesc = "Here we go, test #" + (i+1);
+		var testFilename = testFilenames[i];
+		
+
+		addTestToProject(project1, testName, testDesc, testFilename, managerAddr, managerPass);
+	}
+
+	/* TEMPLATE FILE */
+	// Upload Template File (Hash and Store)
+	var template1 = "template1.stl";
+	uploadFile(template1, true);
+	
+	var template1Name = "Template #1"
+	var template1Desc= "First template file for project";
+	
+	addTemplateToProject(project1, template1Name, template1Desc, template1, managerAddr, managerPass);
+	
+	project1 = Projects.findOne({}, {
+		sort: {
+			createdAt: +1, 
+			limit: 1
+		}
+	});
+
+
+	/* PROTOCOL FILE */
+	var protocol1 = "protocol1.txt";
+	uploadFile(protocol1, false);
+	var protocol1Name = "Protocol #1"	
+	var protocol1Desc=  "First protocol file for project"
+
+	addProtocolToProject(project1, protocol1Name, protocol1Desc, protocol1, managerAddr, managerPass);
+
+	/* BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN BLOCKCHAIN */
+	//Create Contract on BC
+	createContract(project1, managerAddr, managerPass);
+
+	//Update Contract with details from Test Files, Template, Protocol
+	templateSet = Meteor.setTimeout(function() {
+    	templateTxn = setContractTemplate(project1, template1, managerAddr, managerPass)
+    	test1Txn = setContractTest(project1, test1, managerAddr, managerPass)
+    	test2Txn = setContractTest(project1, test2, managerAddr, managerPass)
+    	protoTxn = setContractProtocol(project1, protocol1, managerAddr, managerPass)
+
+    	console.log("Transaction hashes:");
+    	console.log(templateTxn);
+    	console.log(test1Txn);
+    	console.log(test2Txn);
+    	console.log(protoTxn);
+    	
+	}, 3000);
+	return project1._id;
+}
+
+
+
 // Turn this into function, used later
 	//var template1Returned = TestFiles.findOne({hash: template1Hash});
 	//console.log("template1Returned: " + template1Returned.name);
+
+
+designerGetTemplate = function designerGetTemplate(projectId, designerAddr, designerPass){
+	project = Projects.findOne({_id: projectId});
+	console.log(project);
+
+	projectAddr = project.contractAddr;
+	templateSig = project.template.signature;
+
+	var templateHash = ethGetProjectTemplate(projectAddr, designerAddr, designerPass, templateSig);
+
+	// getting owner Addr from project object, will be used to test
+	// 	against who signed template file on BC
+	var ownerAddr = project.ownerPubKey;
+	//var ownerAddr = ethGetOwnerAddress(projectAddr);
+	var sigAddr = ethVerifySig(templateSig, templateHash);
+	
+	// Check that owner signed file
+	if(ownerAddr == sigAddr){
+		templateFile = getFile(templateHash);
+		templateFilename = templateFile.name;
+		templateFileOutput = getHexFileOutput(templateFilename);
+		templateFileHash = hashFile(templateFileOutput);
+		// Check that hashed file on BC is this file
+		if(templateFileHash == templateHash) {
+			console.log("Template tests passed");
+			return templateFile;
+		}
+	}
+	return;
+}
+
+
+designerGetProtocol = function designerGetProtocol(projectId, designerAddr, designerPass){
+	project = Projects.findOne({_id: projectId});
+	console.log(project);
+
+	projectAddr = project.contractAddr;
+	protocolSig = project.protocol.signature;
+
+	var protocolHash = ethGetProjectDetails(projectAddr, designerAddr, designerPass, protocolSig);
+
+	// getting owner Addr from project object, will be used to test
+	// 	against who signed template file on BC
+	var ownerAddr = project.ownerPubKey;
+	//var ownerAddr = ethGetOwnerAddress(projectAddr);
+	var sigAddr = ethVerifySig(protocolSig, protocolHash);
+	
+	// Check that owner signed file
+	if(ownerAddr == sigAddr){
+		protocolFile = getFile(protocolHash);
+		protocolFilename = protocolFile.name;
+		protocolFileOutput = getFileOutput(protocolFilename);
+		protocolFileHash = hashFile(protocolFileOutput);
+		// Check that hashed file on BC is this file
+		if(protocolFileHash == protocolHash) {
+			console.log("Protocol tests passed");
+			return protocolFile;
+		}
+	}
+	return;
+}
+
+protocolGetTestHashes = function protocolGetTestHashes(protocol){
+	/* TODO */
+	//Indicate protocol tests (hashes) to test
+	// Read protocol file
+	// Read test hashes (or sigs?)
+	test1 = "tests1.txt";
+	test1Output = getFileOutput(test1);
+	test1Hash = hashFile(test1Output);
+	test2 = "tests2.txt";
+	test2Output = getFileOutput(test2);
+	test2Hash = hashFile(test2Output)
+	// What will be stored in protocol file (or sigs?)
+	testHashes = [test1Hash, test2Hash];
+	return testHashes;
+}
+
+
+testAgainstLatestVersion = function testAgainstLatestVersion(projectId, testHashes){
+	testFiles = [];
+	// Get Test files from DB
+	for(i=0; i<testHashes.length; i++){
+		testFileHash = testHashes[i];
+		testFile = getFile(testFileHash);
+		testFiles.push(testFile);
+	}
+
+	// Get temporary version stored in project
+	rawVersions = Projects.findOne({_id: projectId}).rawVersions;
+	rawVersionsSorted = _.sortBy(rawVersions, function(rawVersion){ return rawVersion.createdAt; });
+	latestVersion = rawVersionsSorted[0];
+
+	// Test latest version agains test files
+	testResults = {};
+	for(i=0; i<testFiles.length; i++){
+		// Get testFile
+		// Test latestVersion vs testFile
+		// Record result
+		testFile = testFiles[i];
+		resultMsg = "Pass";
+		testResults[testFile.name] = resultMsg;
+	}
+
+	return testResults;
+}

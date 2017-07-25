@@ -86,6 +86,25 @@ VersionSchema = new SimpleSchema({
 	},
 });
 
+RawVersionSchema = new SimpleSchema({
+	name: {
+		type: String 
+	},
+	hash: {
+		type: String
+	},
+	createdAt: {
+		type: Date,
+		label: "Created At",
+		autoValue: function() {
+			return new Date()
+		},
+		autoform: {
+			type: "hidden"
+		}
+	},
+});
+
 
 ProjectSchema = new SimpleSchema({
 	name: {
@@ -149,6 +168,12 @@ ProjectSchema = new SimpleSchema({
 		optional: true,
 	},
 	"versions.$": VersionSchema,
+
+	rawVersions: {
+		type: Array,
+		optional: true,
+	},
+	"rawVersions.$": RawVersionSchema,
 
 	printable: {
 		type: Boolean,
