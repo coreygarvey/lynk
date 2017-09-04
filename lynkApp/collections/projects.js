@@ -25,7 +25,7 @@ ProtocolSchema = new SimpleSchema({
 	desc: {
 		type: String
 	},
-	signature: {
+	hash: {
 		type: String 
 	},
 	publicKey: {
@@ -40,7 +40,7 @@ TemplateSchema = new SimpleSchema({
 	desc: {
 		type: String
 	},
-	signature: {
+	hash: {
 		type: String 
 	},
 	publicKey: {
@@ -55,7 +55,7 @@ TestSchema = new SimpleSchema({
 	desc: {
 		type: String
 	},
-	signature: {
+	hash: {
 		type: String 
 	},
 	publicKey: {
@@ -70,7 +70,7 @@ VersionSchema = new SimpleSchema({
 	desc: {
 		type: String
 	},
-	signature: {
+	hash: {
 		type: String 
 	},
 	publicKey: {
@@ -84,6 +84,16 @@ VersionSchema = new SimpleSchema({
 			type: "hidden"
 		}
 	},
+	createdAt: {
+		type: Date,
+		label: "Created At",
+		autoValue: function() {
+			return new Date()
+		},
+		autoform: {
+			type: "hidden"
+		}
+	},
 });
 
 RawVersionSchema = new SimpleSchema({
@@ -92,6 +102,28 @@ RawVersionSchema = new SimpleSchema({
 	},
 	hash: {
 		type: String
+	},
+	createdAt: {
+		type: Date,
+		label: "Created At",
+		autoValue: function() {
+			return new Date()
+		},
+		autoform: {
+			type: "hidden"
+		}
+	},
+});
+
+PrintableSchema = new SimpleSchema({
+	name: {
+		type: String 
+	},
+	desc: {
+		type: String
+	},
+	signature: {
+		type: String 
 	},
 	createdAt: {
 		type: Date,
@@ -174,6 +206,12 @@ ProjectSchema = new SimpleSchema({
 		optional: true,
 	},
 	"rawVersions.$": RawVersionSchema,
+
+	printables: {
+		type: Array,
+		optional: true,
+	},
+	"printables.$": PrintableSchema,
 
 	printable: {
 		type: Boolean,

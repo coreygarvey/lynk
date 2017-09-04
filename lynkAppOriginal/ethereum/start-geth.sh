@@ -1,0 +1,1 @@
+geth --rpc --rpccorsdomain "http://localhost:3000" --rpcapi "db,eth,net,personal,web3" --testnet --fast console

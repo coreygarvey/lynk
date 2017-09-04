@@ -1,0 +1,3 @@
+Test Number 1
+
+Check file length is longer than 10 char

@@ -1,0 +1,30 @@
+{
+  "contract_name": "Mortal",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "name": "setOwner",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "kill",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    }
+  ],
+  "unlinked_binary": "0x60606040525b60008054600160a060020a03191633600160a060020a03161790555b5b60f5806100306000396000f300606060405263ffffffff60e060020a60003504166313af40358114602a57806341c0e1b5146045575bfe5b3415603157fe5b6043600160a060020a03600435166054565b005b3415604c57fe5b6043609d565b005b600054600160a060020a031615806079575060005433600160a060020a039081169116145b1560995760008054600160a060020a031916600160a060020a0383161790555b5b50565b60005433600160a060020a0390811691161460b85760006000fd5b600054600160a060020a0316ff5b5b5600a165627a7a72305820a724df4cd58a80f4faf156d657733d3ed194700f63059c1c65b0cba551405d840029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1504557831762
+}
